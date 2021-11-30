@@ -8,9 +8,8 @@ module.exports = app => {
     return bcrypt.hashSync(password, salt)
   }
 
-  const save = async (req, res) => {
+  const save = async (req, res) => {  
     const user = { ...req.body }
-    console.log(user)
     if (req.params.id) user.id = req.params.id
 
     try {
@@ -54,5 +53,29 @@ module.exports = app => {
       .catch(err => res.status(500).send(err))
   }
 
-  return { save, get }
+  const getById = (req, res) => {
+    app.db('users')
+      .select('id', 'name', 'email', 'admin')
+      .where({ id: req.params.id})
+      .first()
+      .then(user => res.json(user))
+      .catch(err => res.status(500).send(err))
+  }
+
+  const remove = async (req, res) => {
+    try {
+    existsOrError(req.params.id, 'Codigo do usuario mão informado')
+
+    const rowsDeleted = await app.db('users')
+      .where({id: req.params.id}).del()
+    
+      existsOrError(rowsDeleted, 'Usuario não foi encontrado')
+
+      res.status(204).send() 
+    } catch(msg) {
+      return res.status(400).send(msg)
+    }
+  }
+
+  return { save, get, getById, remove }
 }

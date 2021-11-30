@@ -6,7 +6,7 @@ exports.up = function(knex) {
     table.string('email').notNull().unique()
     table.string('password').notNull()
     table.boolean('admin').notNull().defaultTo(false)
-  })
+})
 };
 
 exports.down = function(knex) {
